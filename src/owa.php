@@ -27,7 +27,7 @@
 
 class OpenWrtApi{
 
-	var $version='1.0.0';
+	var $version='1.0.1';
 
 	private $timeout	=5;
 	private $debug		=false;
@@ -79,6 +79,16 @@ class OpenWrtApi{
 			$this->ubus_session=$result['ubus_rpc_session'];
 			return $result;
 		}
+	}
+
+	//---------------------------------------------------------------
+	public function SetSessionId($session_id){
+		$this->ubus_session=$session_id;
+	}
+
+	//---------------------------------------------------------------
+	public function getSessionId(){
+		return $this->ubus_session;
 	}
 
 	//---------------------------------------------------------------
