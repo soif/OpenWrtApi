@@ -27,7 +27,7 @@
 
 class OpenWrtApi{
 
-	var $version='1.2.0';
+	var $version='1.3.0';
 
 	private $timeout	=5;
 	private $debug		=false;
@@ -146,9 +146,9 @@ class OpenWrtApi{
 	public function UbusListStations($interfaces_names){
 		if(is_array($interfaces_names)){
 			foreach($interfaces_names as $if){
-				$this->_MultiAdd('iwinfo','assoclist',array('device'=>$if));
+				$this->MultiAdd('iwinfo','assoclist',array('device'=>$if));
 			}
-			$answer=$this->_MultiCall();
+			$answer=$this->MultiCall();
 			if(is_array($answer)){
 				foreach($answer as $k => $a){
 					$out[$interfaces_names[$k]]=$a['results'];
@@ -159,29 +159,27 @@ class OpenWrtApi{
 	}
 
 	//---------------------------------------------------------------
-	private function _MultiAdd($path, $method, array $args = array()){
+	public function MultiAdd($path, $method, array $args = array()){
 		if($session_id=$this->ubus_session){
-			
 			$payload=array(
 				$session_id,
 				$path,
-				$method,
-				$args
+				$method
 			);
-			
 			// since OWRT 23.05, ubus call fails when args is empty
 			if (! empty($args)) {
 				$payload[]=$args;
 			}
 
 			$this->rpc_multi[]=$this->_FormatJsonRPC('call',$payload,$this->rpc_multi_id);
+			$id=$this->rpc_multi_id;
 			$this->rpc_multi_id++;
-			return $this->rpc_multi_id;
+			return $id;
 		}
 	}
 
 	//---------------------------------------------------------------
-	private function _MultiCall(){
+	public function MultiCall(){
 		if(is_array($this->rpc_multi) and count($this->rpc_multi)){
 			$answer = $this->_CurlRequest($this->rpc_multi);
 			$this->rpc_multi=array();
